@@ -17,6 +17,7 @@ class ImagePublisher(Node):
             print("Error: Cannot open camera")
             exit
         self.timer = self.create_timer(0.1, self.callback)
+        
     def callback(self):
         ret, frame = self.cap.read()
         if not ret:
