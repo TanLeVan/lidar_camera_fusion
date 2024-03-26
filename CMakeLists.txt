@@ -34,10 +34,11 @@ ${PCL_INCLUDE_DIRS}
 add_executable(lidar_camera_fusion_node src/lidar_camera_merge.cpp)
 ament_target_dependencies(lidar_camera_fusion_node 
                           sensor_msgs message_filters rclcpp Eigen3 
-                          PCL pcl_conversions OpenCV cv_bridge ament_index_cpp) 
+                          PCL pcl_conversions OpenCV cv_bridge ament_index_cpp ) 
 
 target_link_libraries(lidar_camera_fusion_node
 ${OpenCV_LIBRARIES} ${PCL_LIBRARIES}) 
+
 add_executable(test_json src/test_json.cpp)
 ament_target_dependencies(test_json ament_index_cpp)
 

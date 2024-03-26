@@ -95,7 +95,7 @@ private:
                                                         // coordinate of a point in point cloud
         for (int i =0; i<size_inter_lidar; i++){
             pc_matrix(0,0) = -pclCloud->points[i].y;
-            pc_matrix(1,0) = -pclCloud->points[i].z;
+            pc_matrix(1,0) = -pclCloud->points[i].z-0.03;
             pc_matrix(2,0) = pclCloud->points[i].x;
             pc_matrix(3,0) = 1.0;
             //transformation of pointcloud
@@ -109,7 +109,7 @@ private:
             // std::cout << Lidar_cam(0,0) <<"   "<< Lidar_cam(2,0) << std::endl;
             // std::cout << "division: " << Lidar_cam(0,0)/Lidar_cam(2,0) << std::endl;
             int color_dis = (int)(255*pclCloud->points[i].x/5);
-            cv::circle(cv_ptr->image, cv::Point(px_data, py_data), 1, CV_RGB(255-color_dis,color_dis,0),cv::FILLED);
+            cv::circle(cv_ptr->image, cv::Point(px_data, py_data), 2, CV_RGB(255-color_dis,color_dis,0),cv::FILLED);
         }
         sensor_msgs::msg::Image pcl_on_img;
         cv_ptr->toImageMsg(pcl_on_img);

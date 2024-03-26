@@ -9,7 +9,6 @@ void read_camera_martix(){
     nlohmann::json data;
     f>>data;
     std::cout << data["camera_matrix"][0][1] << std::endl;
-
 }
 int main(){
     read_camera_martix();
