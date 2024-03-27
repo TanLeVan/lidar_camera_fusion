@@ -1,12 +1,33 @@
+/***
+ * This program subscribe to a point_cloud topic and a image topic, 
+ * then projected the pointcloud to the image to create a new image. 
+ * The new image with pointcloud is published to topic 
+ * /front_image_with_pc.
+ * 
+ * To project the pointcloud to an image, relative position and 
+ * orientation of point cloud coordinate (LIDAR position) and image
+ * coordinate (camera position) is needed. This information is 
+ * presented in the 3D coordinate transformation matrix between camera and 
+ * LIDAR. At the moment, the tranformation matrix is input manually.
+ * 
+ * ***/
+
+#include <iostream>
+#include <boost/bind.hpp>
+#include <cmath>
+
+// For ros
 #include <memory>
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/msg/image.hpp"
 
+// For synchronization of point cloud message and image message
 #include "message_filters/subscriber.h"
 #include "message_filters/synchronizer.h"
 #include <message_filters/sync_policies/approximate_time.h>
 
+//Point cloud processing library
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <pcl/filters/filter.h>
@@ -14,17 +35,15 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include<Eigen/Dense>
 
+//Image processing library
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-
-#include <iostream>
-#include <boost/bind.hpp>
-#include <cmath>
-
+// For reading the camera matrix in Json file
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <ament_index_cpp/get_package_share_directory.hpp>
+
 
 class CameraLidarFusion : public rclcpp::Node
 {
@@ -32,14 +51,16 @@ typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::msg::Image,
 typedef pcl::PointCloud<pcl::PointXYZI> pclPointCloud;
 
 private:
-    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pcOnImage_pub;
+    // Publisher for the processed image 
+    rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pcOnImage_pub; 
     message_filters::Subscriber<sensor_msgs::msg::Image> image_sub;
     message_filters::Subscriber<sensor_msgs::msg::PointCloud2> pcl_sub;
     std::shared_ptr<message_filters::Synchronizer<MySyncPolicy>> p_sync;
 
-    //Declaring matrix for transformation
+    ////Declaring matrix for transformation
     Eigen::MatrixXf Camera_instrinsic;
-    Eigen::MatrixXf Lidar_to_camera_3D;
+    //3D tranformation matrix from Lidar frame to camera frame
+    Eigen::MatrixXf Lidar_to_camera_3D; 
     Eigen::MatrixXf Lidar_cam; //Matrix to store the point in pointcloud in 
                                     //pixel coordinate
     Eigen::MatrixXf pc_matrix; //matrix to temporaryly hold the point in point cloud
@@ -74,7 +95,7 @@ private:
           return;
         }
 
-        //Conversion of sensor_msgs::msg::PontCloud2 to pcl::PointCloud<T>
+        //Conversion of sensor_msgs::msg::PointCloud2 to pcl::PointCloud<T>
         pcl::PCLPointCloud2 pcl_pc2;
         pcl_conversions::toPCL(*in_pc2,pcl_pc2);
         pclPointCloud::Ptr msg_pointCloud(new pclPointCloud);
